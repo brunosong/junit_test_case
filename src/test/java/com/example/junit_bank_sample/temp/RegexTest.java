@@ -2,6 +2,7 @@ package com.example.junit_bank_sample.temp;
 
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.regex.Pattern;
 
 // java.util.regex.Pattern
@@ -60,6 +61,37 @@ public class RegexTest {
 
         String value = "ABCD";
         boolean result = Pattern.matches("^[a-zA-Z]{2,4}$",value);
+        System.out.println(result);
+
+    }
+
+
+    @Test
+    void account_gubun_test() {
+
+        //String gubun = "DEPOSIT";
+        String gubun = "TRANSFER";
+
+        boolean result = Pattern.matches("^(DEPOSIT|TRANSFER)$",gubun);
+        System.out.println(result);
+
+    }
+
+
+    @Test
+    void account_tel_test1() {
+
+        String tel = "01074637177";
+        boolean result = Pattern.matches("^[0-9]{3}[0-9]{4}[0-9]{4}",tel);
+        System.out.println(result);
+
+    }
+
+    @Test
+    void account_tel_test2() {
+
+        String tel = "010-7463-7177";
+        boolean result = Pattern.matches("^[0-9]{11}|^[0-9]{3}-[0-9]{4}-[0-9]{4}",tel);
         System.out.println(result);
 
     }

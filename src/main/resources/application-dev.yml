@@ -22,6 +22,7 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
         format_sql: true
+    show-sql: true
   output:
     ansi:
       enabled: always
@@ -29,4 +30,5 @@ spring:
 
 logging:
   level:
-    com.example.junit_bank_sample: debug
+    '[com.example.junit_bank_sample]': debug
+    org.hibernate.type: trace

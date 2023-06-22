@@ -1,5 +1,7 @@
 package com.example.junit_bank_sample.config;
 
+import com.example.junit_bank_sample.config.jwt.JwtAuthenticationFilter;
+import com.example.junit_bank_sample.config.jwt.JwtAuthorizationFilter;
 import com.example.junit_bank_sample.domain.user.UserEnum;
 import com.example.junit_bank_sample.dto.ResponseDto;
 import com.example.junit_bank_sample.util.CustomResponseUtil;
@@ -8,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +31,19 @@ public class SecurityConfig {
         log.debug("디버그 : BCryptPasswordEncoder 빈 등록");
         return new BCryptPasswordEncoder();
     }
+
+
+    // JWT 필터 등록이 필요함
+    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+        @Override
+        public void configure(HttpSecurity builder) throws Exception {
+            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthorizationFilter(authenticationManager));
+            super.configure(builder);
+        }
+    }
+
     
     // JWT 서버를 만들어서 세션을 사용하지 않음
     @Bean
@@ -34,6 +52,7 @@ public class SecurityConfig {
         httpSecurity.headers().frameOptions().disable();   //아이프레임 허용안한다.
         httpSecurity.csrf().disable();      //enable 이면 post 맨 작동안함
         httpSecurity.cors().configurationSource(configurationSource()); //다른 서버에서 요청하는 것을 막는것을 풀겠다.
+
         //JSESSIONID 를 서버쪽에서 관리안하겠다는 뜻
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -43,9 +62,20 @@ public class SecurityConfig {
         //httpBasic 은 브라우저가 팝업창을 이용해서 사용자 인증을 진행한다. 그것을 해제한다.
         httpSecurity.httpBasic().disable();
 
+
+        // 필터 적용
+        httpSecurity.apply(new CustomSecurityFilterManager());
+
+
         //Exception 가로채기 자세한정보는 : https://recordsoflife.tistory.com/839 이거 참고하는게 좋겠음
+        //인증실패
         httpSecurity.exceptionHandling().authenticationEntryPoint((request,response,authenticationException) -> {
             CustomResponseUtil.unAuthentication(response, "로그인을 진행해주세요");
+        });
+
+        // 권한 실패
+        httpSecurity.exceptionHandling().accessDeniedHandler((request, response, e) -> {
+            CustomResponseUtil.fail(response, "권한이 없습니다", HttpStatus.FORBIDDEN);
         });
 
         httpSecurity.authorizeRequests()

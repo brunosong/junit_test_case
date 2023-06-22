@@ -18,7 +18,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(CustomApiException.class)
     public ResponseEntity<?> apiException(CustomApiException e) {
         logger.error(e.getMessage());
-        return new ResponseEntity<>(new ResponseDto(-1, "동일한 username 이 존재합니다." , null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseDto(-1, e.getMessage() , null), HttpStatus.BAD_REQUEST);
     }
 
 
