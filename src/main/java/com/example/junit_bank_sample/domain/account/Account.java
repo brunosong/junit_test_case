@@ -65,7 +65,7 @@ public class Account {
         // user.getUsername() //이렇게 하면 lazy 로딩이 되어 셀렉트를 해온다.
         // persitace context 에 머물러 있어서 조회를 해도 디비로 날리지 않는다.
         // 그렇기 때문에 pc 를 깨끗히 비워줘야 한다
-        if(user.getId() != userId){  // id 를 조회할때는 lazy 되지 않고 ( 셀렉트를 하지 않고 ) 가져온다.
+        if(user.getId().longValue() != userId.longValue()){  // id 를 조회할때는 lazy 되지 않고 ( 셀렉트를 하지 않고 ) 가져온다.
             throw new CustomApiException("계좌 소유자가 아닙니다.");
         }
     }

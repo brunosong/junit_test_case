@@ -21,6 +21,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 public class SecurityConfig {
 
@@ -94,7 +97,7 @@ public class SecurityConfig {
         corsConfiguration.addAllowedMethod("*");  //모든 http 메소드를 허용하겠다.
         corsConfiguration.addAllowedOriginPattern("*");  //모든 IP 주소 허용 ( 나중에는 프론트 앤드 주소만 허용해 준다든지 하면 된다. )
         corsConfiguration.setAllowCredentials(true); //클라이언트 쿠키 요청 하용
-
+        corsConfiguration.setExposedHeaders(List.of("Authorization"));   //r1.headers.get("Authorization") 이거를 가져오기 위해선 이거를 풀어줘야 한다.
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);   //모든요청 ( /** ) 에 저 컨피그를 설정하겠다는것
 
